@@ -26,7 +26,7 @@ jobs:
         run: skpr package sast --no-push
 
       - name: 🔍 Trivy scan (fpm)
-        uses: aquasecurity/trivy-action@v0.35
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: localhost/skpr/drupal:sast-fpm
           format: sarif
