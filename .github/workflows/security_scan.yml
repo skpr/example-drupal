@@ -1,0 +1,40 @@
+name: Security Scan
+
+on:
+  push:
+    branches:
+      - sast-nightly
+  workflow_dispatch:
+
+concurrency:
+  group: security-scan
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup skpr
+        uses: skpr/setup-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: 📦 Package
+        run: skpr package sast --no-push
+
+      - name: 🔍 Trivy scan (fpm)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: localhost/skpr/drupal:sast-fpm
+          format: sarif
+          output: sast-fpm.sarif
+          exit-code: "0"
+
+      - name: ⬆️ Upload Trivy SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: sast-fpm.sarif
+          category: trvy-fpm
