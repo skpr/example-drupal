@@ -8,6 +8,7 @@ vendor/
 .gitattributes
 .idea/
 .php/
+.env
 
 !app/sites/default/settings.php
 !app/sites/default/services.yml
