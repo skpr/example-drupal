@@ -54,3 +54,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow_issue_writing: false
           target: https://dev.drupal.qa.skpr.dev/
+          fail_action: true
