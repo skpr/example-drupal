@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  SKPR_USERNAME: ${{ secrets.SKPR_QA_USERNAME }}
+  SKPR_USERNAME: ${{ vars.SKPR_QA_USERNAME }}
   SKPR_PASSWORD: ${{ secrets.SKPR_QA_PASSWORD }}
 
 concurrency:
