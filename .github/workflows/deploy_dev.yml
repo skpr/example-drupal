@@ -49,12 +49,8 @@ jobs:
         uses: actions/checkout@v6
 
       - name: ZAP Scan
-        uses: zaproxy/action-af@v0.2.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
-          plan: '.zap/dev.yml'
-
-      - name: 'Code scanning report'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: dast.sarif.json
-          category: owasp-zap-scan
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allow_issue_writing: false
+          target: https://dev.drupal.qa.skpr.dev/
