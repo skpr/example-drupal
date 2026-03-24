@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - sast-nightly
+  schedule:
+    - cron: '0 0 * * *'
+      timezone: 'Australia/Sydney'
   workflow_dispatch:
 
 concurrency:
@@ -38,3 +41,31 @@ jobs:
         with:
           sarif_file: sast-fpm.sarif
           category: trvy-fpm
+
+      - name: 🔍 Trivy scan (cli)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: localhost/skpr/drupal:sast-cli
+          format: sarif
+          output: sast-cli.sarif
+          exit-code: "0"
+
+      - name: ⬆️ Upload Trivy SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: sast-fpm.sarif
+          category: trvy-cli
+
+      - name: 🔍 Trivy scan (nginx)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: localhost/skpr/drupal:sast-nginx
+          format: sarif
+          output: sast-nginx.sarif
+          exit-code: "0"
+
+      - name: ⬆️ Upload Trivy SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: sast-nginx.sarif
+          category: trvy-nginx
