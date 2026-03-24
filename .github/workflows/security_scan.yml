@@ -1,9 +1,6 @@
 name: Security Scan
 
 on:
-  push:
-    branches:
-      - sast-nightly
   schedule:
     - cron: '0 0 * * *'
       timezone: 'Australia/Sydney'
