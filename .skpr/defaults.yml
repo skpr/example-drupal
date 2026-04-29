@@ -1,3 +1,6 @@
 type: drupal
 
 size: "small"
+
+metrics:
+  enabled: true
