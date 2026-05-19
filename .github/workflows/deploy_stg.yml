@@ -10,7 +10,7 @@ env:
   SKPR_PASSWORD: ${{ secrets.SKPR_QA_PASSWORD }}
 
 concurrency:
-  group: deploy-dev
+  group: deploy-stg
   cancel-in-progress: true
 
 jobs:
