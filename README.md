@@ -1,4 +1,4 @@
 # Drupal
 
-Example for deploying Drupal on Skpr.
+Example for deploying Drupal on Skpr. 
 
