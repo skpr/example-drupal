@@ -2,5 +2,10 @@ type: drupal
 
 size: "small"
 
+cron:
+  drush:
+    command:  "drush cron"
+    schedule: "@hourly"
+
 metrics:
   enabled: true
