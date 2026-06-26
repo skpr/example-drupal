@@ -1,0 +1,17 @@
+name: 'Supermarket Semantic Search'
+description: 'Creates the supermarket_item content type and fields, the OpenSearch search server and index, and the semantic search view. Requires the Standard profile (provides the body field storage, basic_html/restricted_html filter formats and the teaser view mode).'
+type: 'Content type'
+install:
+  - menu_ui
+  - text
+  - path
+  - node
+  - user
+  - filter
+  - views
+  - search_api
+  - search_api_opensearch
+  - search_api_opensearch_semantic
+config:
+  import:
+    search_api_opensearch_semantic: '*'

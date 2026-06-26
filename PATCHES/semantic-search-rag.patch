@@ -1,0 +1,1045 @@
+diff --git a/config/schema/search_api_opensearch_semantic.schema.yml b/config/schema/search_api_opensearch_semantic.schema.yml
+index d15caef2cad1268f88e70a0e5ea4dad98be909c2..3f1813e3df9421f89046ff29139fd58c92aa8686 100644
+--- a/config/schema/search_api_opensearch_semantic.schema.yml
++++ b/config/schema/search_api_opensearch_semantic.schema.yml
+@@ -11,6 +11,19 @@ search_api.index.*.third_party.search_api_opensearch_semantic:
+     search_pipeline:
+       type: string
+       label: 'Search pipeline'
++    rag:
++      type: mapping
++      label: 'RAG Settings'
++      mapping:
++        enable_rag:
++          type: boolean
++          label: 'Enable RAG search'
++        rag_llm_model:
++          type: string
++          label: 'RAG LLM Model'
++        rag_prompt:
++          type: string
++          label: 'RAG Prompt'
+ views.filter.search_api_semantic:
+   type: views.filter.search_api_fulltext
+   label: 'Semantic search filter plugin'
+diff --git a/phpstan-baseline.neon b/phpstan-baseline.neon
+index f996f4bd396f1536a18fdae756e02edb167320f8..9461ab028e35aeaff3f470077f596252158fb53d 100644
+--- a/phpstan-baseline.neon
++++ b/phpstan-baseline.neon
+@@ -1,38 +1,47 @@
+ parameters:
+ 	ignoreErrors:
+ 		-
+-			message: '#^Call to an undefined method Drupal\\Core\\Form\\FormInterface\:\:getEntity\(\)\.$#'
+-			identifier: method.notFound
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Event\\\\ViewsPluginInitializeEvent\\:\\:__construct\\(\\) has parameter \\$result with no value type specified in iterable type Drupal\\\\search_api\\\\Query\\\\ResultSetInterface\\.$#"
++			count: 1
++			path: src/Event/ViewsPluginInitializeEvent.php
++
++		-
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Event\\\\ViewsPluginInitializeEvent\\:\\:getResults\\(\\) return type has no value type specified in iterable type Drupal\\\\search_api\\\\Query\\\\ResultSetInterface\\.$#"
++			count: 1
++			path: src/Event/ViewsPluginInitializeEvent.php
++
++		-
++			message: "#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getEntity\\(\\)\\.$#"
++			count: 2
++			path: src/Hook/IndexHooks.php
++
++		-
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexHooks\\:\\:alterIndexForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexHooks.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\IndexHooks\:\:alterIndexForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexHooks\\:\\:indexAddFieldFormAlter\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexHooks.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\IndexHooks\:\:indexAddFieldFormAlter\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexHooks\\:\\:submitIndexForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexHooks.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\IndexHooks\:\:validateIndexAddFieldForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexHooks\\:\\:validateIndexAddFieldForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexHooks.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\IndexParamValueHooks\:\:indexParamValueAlter\(\) has parameter \$field with no value type specified in iterable type Drupal\\search_api\\Item\\FieldInterface\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexParamValueHooks\\:\\:indexParamValueAlter\\(\\) has parameter \\$field with no value type specified in iterable type Drupal\\\\search_api\\\\Item\\\\FieldInterface\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexParamValueHooks.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\IndexParamValueHooks\:\:indexParamValueAlter\(\) has parameter \$originalValue with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\IndexParamValueHooks\\:\\:indexParamValueAlter\\(\\) has parameter \\$originalValue with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/IndexParamValueHooks.php
+
+@@ -41,105 +50,97 @@ parameters:
+ 			identifier: parameterByRef.type
+ 			count: 1
+ 			path: src/Hook/IndexParamValueHooks.php
+-
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Hook\\ViewsData\:\:viewsDataAlter\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Hook\\\\ViewsData\\:\\:viewsDataAlter\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Hook/ViewsData.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\search_api\\processor\\TextChunking\:\:buildConfigurationForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\search_api\\\\processor\\\\TextChunking\\:\\:buildConfigurationForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/search_api/processor/TextChunking.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\search_api\\processor\\TextChunking\:\:buildConfigurationForm\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\search_api\\\\processor\\\\TextChunking\\:\\:buildConfigurationForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/search_api/processor/TextChunking.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiHybridSemantic\:\:defineOptions\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\area\\\\AiSummary\\:\\:defineOptions\\(\\) return type has no value type specified in iterable type array\\.$#"
++			count: 1
++			path: src/Plugin/views/area/AiSummary.php
++
++		-
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiHybridSemantic\\:\\:defineOptions\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiHybridSemantic.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemantic\:\:buildOptionsForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemantic\\:\\:buildOptionsForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemantic.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemanticSearchFilterBase\:\:buildExposeForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemanticSearchFilterBase\\:\\:buildExposeForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemanticSearchFilterBase\:\:buildOptionsForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemanticSearchFilterBase\\:\\:buildOptionsForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemanticSearchFilterBase\:\:defineOptions\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemanticSearchFilterBase\\:\\:defineOptions\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemanticSearchFilterBase\:\:operators\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemanticSearchFilterBase\\:\\:operators\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\Plugin\\views\\filter\\SearchApiSemanticSearchFilterBase\:\:submitOptionsForm\(\) has parameter \$form with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\filter\\\\SearchApiSemanticSearchFilterBase\\:\\:submitOptionsForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\SearchAPI\\Query\\SemanticSearchParamBuilder\:\:buildHybridParams\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\Plugin\\\\views\\\\query\\\\SemanticSearchQuery\\:\\:create\\(\\) has parameter \\$configuration with no value type specified in iterable type array\\.$#"
++			count: 1
++			path: src/Plugin/views/query/SemanticSearchQuery.php
++
++		-
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\SearchAPI\\\\Query\\\\SemanticSearchParamBuilder\\:\\:buildHybridParams\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/SearchAPI/Query/SemanticSearchParamBuilder.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\SearchAPI\\Query\\SemanticSearchParamBuilder\:\:buildNeuralParams\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\SearchAPI\\\\Query\\\\SemanticSearchParamBuilder\\:\\:buildNeuralParams\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/SearchAPI/Query/SemanticSearchParamBuilder.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\SearchAPI\\Query\\SemanticSearchParamBuilder\:\:buildSearchParams\(\) has parameter \$indexFields with no value type specified in iterable type Drupal\\search_api\\Item\\FieldInterface\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\SearchAPI\\\\Query\\\\SemanticSearchParamBuilder\\:\\:buildSearchParams\\(\\) has parameter \\$indexFields with no value type specified in iterable type Drupal\\\\search_api\\\\Item\\\\FieldInterface\\.$#"
+ 			count: 1
+ 			path: src/SearchAPI/Query/SemanticSearchParamBuilder.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\SearchAPI\\Query\\SemanticSearchParamBuilder\:\:buildSearchParams\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\SearchAPI\\\\Query\\\\SemanticSearchParamBuilder\\:\\:buildSearchParams\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/SearchAPI/Query/SemanticSearchParamBuilder.php
+
+ 		-
+-			message: '#^Method Drupal\\search_api_opensearch_semantic\\SearchAPI\\Query\\SemanticSearchParamBuilder\:\:buildSearchParams\(\) return type has no value type specified in iterable type array\.$#'
+-			identifier: missingType.iterableValue
++			message: "#^Method Drupal\\\\search_api_opensearch_semantic\\\\SearchAPI\\\\Query\\\\SemanticSearchParamBuilder\\:\\:buildSearchParams\\(\\) return type has no value type specified in iterable type array\\.$#"
+ 			count: 1
+ 			path: src/SearchAPI/Query/SemanticSearchParamBuilder.php
+
+ 		-
+-			message: '#^Method Drupal\\Tests\\search_api_opensearch_semantic\\Kernel\\SearchApiOpenSearchSemanticTestBase\:\:getBackend\(\) should return Drupal\\search_api_opensearch\\Plugin\\search_api\\backend\\OpenSearchBackend\|null but returns Drupal\\search_api\\Backend\\BackendInterface\|null\.$#'
+-			identifier: return.type
++			message: "#^Method Drupal\\\\Tests\\\\search_api_opensearch_semantic\\\\Kernel\\\\SearchApiOpenSearchSemanticTestBase\\:\\:getBackend\\(\\) should return Drupal\\\\search_api_opensearch\\\\Plugin\\\\search_api\\\\backend\\\\OpenSearchBackend\\|null but returns Drupal\\\\search_api\\\\Backend\\\\BackendInterface\\|null\\.$#"
+ 			count: 1
+ 			path: tests/src/Kernel/SearchApiOpenSearchSemanticTestBase.php
+
+ 		-
+-			message: '#^Call to an undefined method Drupal\\search_api_opensearch\\SearchAPI\\BackendClientInterface\:\:getIndexId\(\)\.$#'
+-			identifier: method.notFound
++			message: "#^Call to an undefined method Drupal\\\\search_api_opensearch\\\\SearchAPI\\\\BackendClientInterface\\:\\:getIndexId\\(\\)\\.$#"
+ 			count: 1
+ 			path: tests/src/Kernel/SemanticFieldTest.php
+diff --git a/search_api_opensearch_semantic.services.yml b/search_api_opensearch_semantic.services.yml
+index de682b32083a753844c623d35548259668e6f1ae..6b26c8c8d372b12bc8f1069259066758d4d56c19 100644
+--- a/search_api_opensearch_semantic.services.yml
++++ b/search_api_opensearch_semantic.services.yml
+@@ -6,6 +6,9 @@ services:
+   Drupal\search_api_opensearch_semantic\EventSubscriber\SemanticFieldMappingEventSubscriber: ~
+   Drupal\search_api_opensearch_semantic\EventSubscriber\VectorIndexEventSubscriber: ~
+   Drupal\search_api_opensearch_semantic\EventSubscriber\QueryParamsEventSubscriber: ~
++  Drupal\search_api_opensearch_semantic\EventSubscriber\RAGQueryParamsEventSubscriber: ~
++  Drupal\search_api_opensearch_semantic\EventSubscriber\ViewsPluginInitializeEventSubscriber: ~
++  Drupal\search_api_opensearch_semantic\EventSubscriber\HybridSearchQueryEventSubscriber: ~
+
+   Drupal\search_api_opensearch_semantic\SearchAPI\Query\SemanticSearchParamBuilder:
+     decorates: search_api_opensearch.search_param_builder
+diff --git a/src/Event/ViewsPluginInitializeEvent.php b/src/Event/ViewsPluginInitializeEvent.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..311783747baf30cad7bf0701a3075a9203df461a
+--- /dev/null
++++ b/src/Event/ViewsPluginInitializeEvent.php
+@@ -0,0 +1,38 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\Event;
++
++use Drupal\search_api\Query\ResultSetInterface;
++use Drupal\views\ViewExecutable;
++
++/**
++ * Event fired after view's ViewsExecutable is initialized.
++ *
++ * This event allows altering view's header, footer handler plugin.
++ *
++ * @see \Drupal\search_api_opensearch_semantic\Plugin\views\query\SemanticSearchQuery::execute()
++ */
++class ViewsPluginInitializeEvent {
++
++  public function __construct(
++    protected ResultSetInterface $result,
++    protected ViewExecutable $view,
++  ) {}
++
++  /**
++   * Get the results.
++   */
++  public function getResults(): ResultSetInterface {
++    return $this->result;
++  }
++
++  /**
++   * Get the index.
++   */
++  public function getView(): ViewExecutable {
++    return $this->view;
++  }
++
++}
+diff --git a/src/EventSubscriber/HybridSearchQueryEventSubscriber.php b/src/EventSubscriber/HybridSearchQueryEventSubscriber.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..953159b9ee5f16a3dd93d5f1cbd1f9139c2e38c3
+--- /dev/null
++++ b/src/EventSubscriber/HybridSearchQueryEventSubscriber.php
+@@ -0,0 +1,65 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\EventSubscriber;
++
++use Drupal\search_api_opensearch\Event\QueryParamsEvent;
++use Drupal\search_api_opensearch_semantic\Enum\SearchTypeEnum;
++use Symfony\Component\EventDispatcher\EventSubscriberInterface;
++
++/**
++ * Restructures hybrid search query into valid OpenSearch hybrid query format.
++ *
++ * The core QueryParamBuilder wraps all search params inside query.bool.must,
++ * but OpenSearch requires the hybrid query at the top level of "query".
++ * Filters must also be moved to "post_filter" for hybrid queries.
++ *
++ * @see https://docs.opensearch.org/latest/query-dsl/compound/hybrid/#limitations
++ */
++class HybridSearchQueryEventSubscriber implements EventSubscriberInterface {
++
++  /**
++   * Restructures hybrid query params into valid OpenSearch format.
++   */
++  public function onQueryParamsBuild(QueryParamsEvent $event): void {
++    // Only act on hybrid search type queries.
++    if ($event->getQuery()->getOption('search_type') !== SearchTypeEnum::Hybrid) {
++      return;
++    }
++
++    $params = $event->getParams();
++
++    // Only act when hybrid is nested inside query.bool.must.
++    // This is an invalid search for hybrid queries.
++    if (empty($params['body']['query']['bool']['must']['hybrid'])) {
++      return;
++    }
++
++    $hybridQuery = $params['body']['query']['bool']['must']['hybrid'];
++    $filters = $params['body']['query']['bool']['filter'] ?? NULL;
++
++    // Move hybrid to top-level query.
++    $params['body']['query'] = ['hybrid' => $hybridQuery];
++
++    // Move filters to post_filter (filters can't be siblings of hybrid).
++    if ($filters !== NULL) {
++      $params['body']['post_filter'] = $filters;
++    }
++
++    $event->setParams($params);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function getSubscribedEvents(): array {
++    return [
++      // Priority -100 ensures this runs after all other QueryParamsEvent
++      // subscribers (e.g. QueryParamsEventSubscriber adds min_score and
++      // search_pipeline, RAGQueryParamsEventSubscriber adds ext params).
++      QueryParamsEvent::class => ['onQueryParamsBuild', -100],
++    ];
++  }
++
++}
+diff --git a/src/EventSubscriber/QueryParamsEventSubscriber.php b/src/EventSubscriber/QueryParamsEventSubscriber.php
+index 6563a810122c4f30c754845e37639fdc0db6a165..8d7983f6a6d0a6ce8beaac7cbe4199da52c6092f 100644
+--- a/src/EventSubscriber/QueryParamsEventSubscriber.php
++++ b/src/EventSubscriber/QueryParamsEventSubscriber.php
+@@ -29,8 +29,15 @@ class QueryParamsEventSubscriber implements EventSubscriberInterface {
+       $params['body']['min_score'] = $event->getQuery()->getOption('min_score') ?? 0;
+     }
+
+-    // Pass search pipeline if search is hybrid search.
+-    if (($pipeline = $event->getQuery()->getIndex()->getThirdPartySetting('search_api_opensearch_semantic', 'search_pipeline')) !== NULL) {
++    // Pass search pipeline if search is hybrid search and key is present.
++    //
++    // On pages like the search_api index landing page, we don't have the key.
++    // In such cases, we don't need to pass pipeline because a search
++    // query to know the "Server index status" doesn't need a pipeline.\
++    //
++    // In RAG search if we pass search_pipeline without key, it throws error.
++    $keys = $event->getQuery()->getOriginalKeys();
++    if (($pipeline = $event->getQuery()->getIndex()->getThirdPartySetting('search_api_opensearch_semantic', 'search_pipeline')) !== NULL && $keys !== NULL) {
+       $params['search_pipeline'] = $pipeline;
+     }
+     $event->setParams($params);
+diff --git a/src/EventSubscriber/RAGQueryParamsEventSubscriber.php b/src/EventSubscriber/RAGQueryParamsEventSubscriber.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..271884ebbe2411bd432f93dc5f3c8aee3a082423
+--- /dev/null
++++ b/src/EventSubscriber/RAGQueryParamsEventSubscriber.php
+@@ -0,0 +1,52 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\EventSubscriber;
++
++use Drupal\search_api_opensearch\Event\QueryParamsEvent;
++use Drupal\search_api_opensearch_semantic\Trait\SemanticIndexTrait;
++use Symfony\Component\EventDispatcher\EventSubscriberInterface;
++
++/**
++ * Subscribes to QueryParamsEvent to add RAG queries.
++ */
++class RAGQueryParamsEventSubscriber implements EventSubscriberInterface {
++
++  use SemanticIndexTrait;
++
++  /**
++   * Adds min_score value if it is semantic search index.
++   */
++  public function onQueryParamsBuild(QueryParamsEvent $event): void {
++    if ($this->isRagEnabled($event->getQuery()->getIndex()->id()) === FALSE) {
++      return;
++    }
++    $params = $event->getParams();
++    $settings = $event->getQuery()->getIndex()->getThirdPartySettings('search_api_opensearch_semantic');
++    $keys = $event->getQuery()->getOriginalKeys();
++    if ($keys === NULL) {
++      return;
++    }
++    assert(\is_string($keys));
++    // Build Param for RAG.
++    $params['body']['ext'] = [
++      'generative_qa_parameters' => [
++        'llm_model' => $settings['rag']['rag_llm_model'],
++        'llm_question' => $keys,
++        'context_size' => 5,
++      ],
++    ];
++    $event->setParams($params);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function getSubscribedEvents(): array {
++    return [
++      QueryParamsEvent::class => ['onQueryParamsBuild'],
++    ];
++  }
++
++}
+diff --git a/src/EventSubscriber/ViewsPluginInitializeEventSubscriber.php b/src/EventSubscriber/ViewsPluginInitializeEventSubscriber.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..5868af4e1c2f1bb236ebd9e499e9d50c818a10c7
+--- /dev/null
++++ b/src/EventSubscriber/ViewsPluginInitializeEventSubscriber.php
+@@ -0,0 +1,40 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\EventSubscriber;
++
++use Drupal\search_api_opensearch_semantic\Event\ViewsPluginInitializeEvent;
++use Drupal\search_api_opensearch_semantic\Plugin\views\area\AiSummary;
++use Symfony\Component\EventDispatcher\EventSubscriberInterface;
++
++/**
++ * Subscribes to ViewsPluginInitialize to update views area plugin.
++ */
++class ViewsPluginInitializeEventSubscriber implements EventSubscriberInterface {
++
++  /**
++   * Set the RAG result summary to the header's area plugin.
++   */
++  public function initializeViewsPlugin(ViewsPluginInitializeEvent $event): void {
++    $view = $event->getView();
++    $results = $event->getResults();
++    if (!array_key_exists(AiSummary::PLUGIN_ID, $view->header)) {
++      return;
++    }
++    if (!array_key_exists('retrieval_augmented_generation', $results->getExtraData('opensearch_response')['ext'] ?? [])) {
++      return;
++    }
++    $view->header[AiSummary::PLUGIN_ID]->options['rag_result_summary'] = $results->getExtraData('opensearch_response')['ext']['retrieval_augmented_generation'];
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function getSubscribedEvents(): array {
++    return [
++      ViewsPluginInitializeEvent::class => ['initializeViewsPlugin'],
++    ];
++  }
++
++}
+diff --git a/src/Hook/IndexHooks.php b/src/Hook/IndexHooks.php
+index 59a29bd5c618887a5cc306284ff1f546c7fe17f3..85665ff5b81a0d22a9bf3bc8e3b8f00a785a25e8 100644
+--- a/src/Hook/IndexHooks.php
++++ b/src/Hook/IndexHooks.php
+@@ -8,7 +8,11 @@ use Drupal\Core\Form\FormStateInterface;
+ use Drupal\Core\Hook\Attribute\Hook;
+ use Drupal\Core\StringTranslation\StringTranslationTrait;
+ use Drupal\Core\StringTranslation\TranslatableMarkup;
++use Drupal\search_api\SearchApiException;
++use Drupal\search_api_opensearch\Plugin\search_api\backend\OpenSearchBackend;
+ use Drupal\search_api_opensearch_semantic\Plugin\search_api\data_type\Semantic;
++use OpenSearch\Exception\OpenSearchExceptionInterface;
++use Psr\Http\Client\ClientExceptionInterface;
+
+ /**
+  * Provides hooks for altering the search API index form.
+@@ -61,6 +65,50 @@ class IndexHooks {
+         ':link' => 'https://docs.opensearch.org/docs/latest/vector-search/ai-search/hybrid-search/index',
+       ]),
+     ];
++    $form['third_party_settings']['search_api_opensearch_semantic']['rag'] = [
++      '#tree' => TRUE,
++      '#type' => 'details',
++      '#title' => $this->t('OpenSearch RAG Integration'),
++      '#collapsed' => TRUE,
++    ];
++    $form['third_party_settings']['search_api_opensearch_semantic']['rag']['enable_rag'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Enable RAG Search'),
++      '#default_value' => $settings['rag']['enable_rag'] ?? FALSE,
++      '#description' => $this->t('See :link', [
++        ':link' => 'https://docs.opensearch.org/latest/tutorials/gen-ai/rag/conversational-search-claude-bedrock/',
++      ]),
++    ];
++    $form['third_party_settings']['search_api_opensearch_semantic']['rag']['rag_llm_model'] = [
++      '#type' => 'textfield',
++      '#title' => $this->t('The LLM model name to use for RAG result retrieval'),
++      '#default_value' => $settings['rag']['rag_llm_model'] ?? FALSE,
++      '#description' => $this->t('LLM model to be used for generating RAG summary. Model name should be something like <em>bedrock-converse/anthropic.claude-3-sonnet-2024xxx-v1:0</em>. See step 1.3 in :link', [
++        ':link' => 'https://docs.opensearch.org/latest/tutorials/gen-ai/rag/conversational-search-claude-bedrock/',
++      ]),
++      '#states' => [
++        'visible' => [
++          ':input[name="third_party_settings[search_api_opensearch_semantic][rag][enable_rag]"]' => ['checked' => TRUE],
++        ],
++      ],
++    ];
++    $form['third_party_settings']['search_api_opensearch_semantic']['rag']['rag_prompt'] = [
++      '#type' => 'textarea',
++      '#title' => $this->t('The LLM prompt to use for generating summary.'),
++      '#default_value' => $settings['rag']['rag_prompt'] ?? FALSE,
++      '#description' => $this->t('Provide an appropriate LLM prompt that helps to generate the summary from the results. See step 1.2 in :link', [
++        ':link' => 'https://docs.opensearch.org/latest/tutorials/gen-ai/rag/conversational-search-claude-bedrock/#step-12-configure-rag',
++      ]),
++      '#states' => [
++        'visible' => [
++          ':input[name="third_party_settings[search_api_opensearch_semantic][rag][enable_rag]"]' => ['checked' => TRUE],
++        ],
++        'required' => [
++          ':input[name="third_party_settings[search_api_opensearch_semantic][rag][enable_rag]"]' => ['checked' => TRUE],
++        ],
++      ],
++    ];
++    $form['actions']['submit']['#submit'][] = [self::class, 'submitIndexForm'];
+   }
+
+   /**
+@@ -92,4 +140,51 @@ class IndexHooks {
+     }
+   }
+
++  /**
++   * Validate that field knn is enabled when semantic field is selected.
++   */
++  public static function submitIndexForm(array &$form, FormStateInterface $form_state): void {
++    /** @var \Drupal\search_api\IndexInterface $index */
++    $index = $form_state->getFormObject()->getEntity();
++    $ragSettings = $index->getThirdPartySetting('search_api_opensearch_semantic', 'rag');
++    if ((bool) $ragSettings['enable_rag'] === FALSE) {
++      return;
++    }
++    $backend = $index->getServerInstance()->getBackend();
++    assert($backend instanceof OpenSearchBackend);
++    /** @var \OpenSearch\Client $client */
++    $client = $backend->getClient();
++
++    $backendConfig = $backend->getConfiguration();
++    $prefix = $backendConfig['advanced']['prefix'] ?? '';
++    $indexId = sprintf('%s%s', $prefix, $index->id());
++
++    // Increase the max_token_count for the index.
++    $index_param = ['index' => $indexId];
++    try {
++      $client->indices()->putSettings($index_param + [
++        'body' => [
++          'index.analyze.max_token_count' => 90000,
++        ],
++      ]);
++
++      // Update the prompt.
++      $pipelineId = $index->getThirdPartySetting('search_api_opensearch_semantic', 'search_pipeline');
++      $pipelineData = $client->searchPipeline()->get(['id' => $pipelineId]);
++      foreach ($pipelineData[$pipelineId]['response_processors'] as &$processor) {
++        if (isset($processor['retrieval_augmented_generation'])) {
++          $processor['retrieval_augmented_generation']['user_instructions'] = $ragSettings['rag_prompt'];
++        }
++      }
++      $client->searchPipeline()->put([
++        'id' => $index->getThirdPartySetting('search_api_opensearch_semantic', 'search_pipeline'),
++        'body' => $pipelineData[$pipelineId],
++      ]);
++    }
++    catch (OpenSearchExceptionInterface | ClientExceptionInterface $e) {
++      throw new SearchApiException(sprintf('An error occurred updating settings for index %s.', $index->id()), 0, $e);
++    }
++
++  }
++
+ }
+diff --git a/src/Hook/ViewsData.php b/src/Hook/ViewsData.php
+index ca5fee41725f1e49d6b6482d4bb9441ce10d104b..ad7c46b7a835492deb906abc7ea44c9b2af1b378 100644
+--- a/src/Hook/ViewsData.php
++++ b/src/Hook/ViewsData.php
+@@ -8,8 +8,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Hook\Attribute\Hook;
+ use Drupal\Core\StringTranslation\StringTranslationTrait;
+ use Drupal\search_api\Entity\Index;
++use Drupal\search_api_opensearch_semantic\Plugin\views\query\SemanticSearchQuery;
++use Drupal\search_api_opensearch_semantic\Plugin\views\area\AiSummary;
+ use Drupal\search_api_opensearch_semantic\Plugin\views\filter\SearchApiHybridSemantic;
+ use Drupal\search_api_opensearch_semantic\Plugin\views\filter\SearchApiSemantic;
++use Drupal\search_api_opensearch_semantic\Trait\SemanticIndexTrait;
+
+ /**
+  * Views data hooks for views related plugins.
+@@ -17,6 +20,7 @@ use Drupal\search_api_opensearch_semantic\Plugin\views\filter\SearchApiSemantic;
+ class ViewsData {
+
+   use StringTranslationTrait;
++  use SemanticIndexTrait;
+
+   /**
+    * Constructs ViewsData object.
+@@ -51,6 +55,20 @@ class ViewsData {
+       if ($fulltext_field != 'search_api_fulltext') {
+         $table[$fulltext_field]['real field'] = 'search_api_fulltext';
+       }
++
++      // Add AI Summary in the header.
++      $data['views']['ai_summary'] = [
++        'title' => $this->t('AI summary'),
++        'help' => $this->t('Shows AI powered result summary.'),
++        'area' => [
++          'id' => AiSummary::PLUGIN_ID,
++        ],
++      ];
++
++      // Override the search query plugin to so we can pass RAG search info.
++      if ($this->isRagEnabled($index->id())) {
++        $table['table']['base']['query_id'] = SemanticSearchQuery::PLUGIN_ID;
++      }
+     }
+   }
+
+diff --git a/src/Plugin/views/area/AiSummary.php b/src/Plugin/views/area/AiSummary.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5aa06a607f696245135320c87059ca0baf9cb7c
+--- /dev/null
++++ b/src/Plugin/views/area/AiSummary.php
+@@ -0,0 +1,127 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\Plugin\views\area;
++
++use Drupal\Component\Utility\Html;
++use Drupal\Component\Utility\Xss;
++use Drupal\Core\Form\FormStateInterface;
++use Drupal\Core\Render\RendererInterface;
++use Drupal\views\Attribute\ViewsArea;
++use Drupal\views\Plugin\views\area\AreaPluginBase;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++
++/**
++ * Views area handler to display some configurable result summary.
++ *
++ * @ingroup views_area_handlers
++ */
++#[ViewsArea(id: self::PLUGIN_ID)]
++class AiSummary extends AreaPluginBase {
++
++  public const string PLUGIN_ID = 'ai_summary';
++
++  /**
++   * {@inheritdoc}
++   *
++   * @phpstan-ignore-next-line
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
++    /** @var static $plugin */
++    $plugin = parent::create($container, $configuration, $plugin_id, $plugin_definition);
++    $plugin->setRenderer($container->get('renderer'));
++    return $plugin;
++  }
++
++  /**
++   * Sets the renderer service.
++   */
++  public function setRenderer(RendererInterface $renderer): static {
++    $this->renderer = $renderer;
++    return $this;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function defineOptions(): array {
++    $options = parent::defineOptions();
++    $options['rag_result_summary'] = ['default' => ''];
++    $options['title'] = ['default' => '✨ AI generated summary'];
++    return $options;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  // @phpstan-ignore-next-line
++  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
++    $form['title'] = [
++      '#type' => 'textfield',
++      '#title' => $this->t('AI Summary title'),
++      '#description' => $this->t('This title will be displayed on AI summary results.'),
++      '#default_value' => $this->options['title'],
++      '#required' => TRUE,
++    ];
++    parent::buildOptionsForm($form, $form_state);
++  }
++
++  /**
++   * {@inheritdoc}
++   *
++   * @phpstan-ignore missingType.iterableValue
++   */
++  public function render($empty = FALSE): array {
++    // @see \Drupal\search_api_opensearch_semantic\Plugin\views\Query\SemanticSearchQuery::execute()
++    if ($this->view->result === [] || $this->options['rag_result_summary'] === '') {
++      return [];
++    }
++    $answer = [
++      '#type' => '#markup',
++      '#markup' => $this->filterResponse($this->options['rag_result_summary']['answer']),
++    ];
++    return [
++      '#type' => 'inline_template',
++      '#template' => '<div class="search-api-ai-summary"><h4>{{ title }}</h4>{{ summary }}</div>',
++      '#context' => [
++        'title' => $this->options['title'],
++        'summary' => $this->renderer->renderInIsolation($answer),
++      ],
++    ];
++  }
++
++  /**
++   * Applies Drupal filters and strips/corrects data coming from AI.
++   */
++  public function filterResponse(?string $text): string {
++    if ($text === NULL) {
++      return '';
++    }
++    // Decode the text so if AI returns encoded text, we can display correct
++    // values.
++    $text = Html::decodeEntities($text);
++    $text = Xss::filter($text, [
++      'a',
++      'b',
++      'h1',
++      'h2',
++      'h3',
++      'h4',
++      'h5',
++      'h6',
++      'li',
++      'ol',
++      'p',
++      'strong',
++      'sub',
++      'sup',
++      'ul',
++    ]);
++    // Despite decoding entities, there are still some entities left.
++    // For now, we are replacing it with empty string. Even if we pass
++    // instructions to LLM, it still ignores it.
++    return \str_replace(['&lt;', '&gt;'], '', $text);
++  }
++
++}
+diff --git a/src/Plugin/views/filter/SearchApiHybridSemantic.php b/src/Plugin/views/filter/SearchApiHybridSemantic.php
+index 0f8e113cc1f2df8e09a9a470019b646887c47fbe..77095ce33b254eaedd694bf3988bcd0b4401dae3 100644
+--- a/src/Plugin/views/filter/SearchApiHybridSemantic.php
++++ b/src/Plugin/views/filter/SearchApiHybridSemantic.php
+@@ -25,7 +25,7 @@ class SearchApiHybridSemantic extends SearchApiSemanticSearchFilterBase {
+    */
+   public function defineOptions(): array {
+     $options = parent::defineOptions();
+-    $options['hybrid_search'] = TRUE;
++    $options['hybrid_search'] = ['default' => TRUE];
+     return $options;
+   }
+
+diff --git a/src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php b/src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+index a55e9711eb066dec8201509a597ca676de789a38..684fb53fa313dec9e0d8ecb6de7b929113467e5b 100644
+--- a/src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
++++ b/src/Plugin/views/filter/SearchApiSemanticSearchFilterBase.php
+@@ -19,10 +19,11 @@ class SearchApiSemanticSearchFilterBase extends SearchApiFulltext {
+    */
+   public function defineOptions(): array {
+     $options = parent::defineOptions();
+-    unset($options['operator']);
++    // unset($options['operator']).
++    $options['operator']['default'] = 'or';
+     $options['min_score'] = ['default' => 0.99];
+-    $options['semantic_field'] = NULL;
+-    $options['fulltext_fields'] = [];
++    $options['semantic_field'] = ['default' => ''];
++    $options['fulltext_fields'] = ['default' => []];
+     return $options;
+   }
+
+diff --git a/src/Plugin/views/query/SemanticSearchQuery.php b/src/Plugin/views/query/SemanticSearchQuery.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..d91dc250340470bea65e1b4502ad94d6ab600699
+--- /dev/null
++++ b/src/Plugin/views/query/SemanticSearchQuery.php
+@@ -0,0 +1,133 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\search_api_opensearch_semantic\Plugin\views\query;
++
++use Drupal\Core\StringTranslation\TranslatableMarkup;
++use Drupal\search_api\Plugin\views\query\SearchApiQuery;
++use Drupal\search_api_opensearch_semantic\Event\ViewsPluginInitializeEvent;
++use Drupal\views\Attribute\ViewsQuery;
++use Drupal\views\ViewExecutable;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
++
++/**
++ * Defines a Views query class for searching on Search API indexes.
++ */
++#[ViewsQuery(
++  id: self::PLUGIN_ID,
++  title: new TranslatableMarkup('Semantic Search API Query'),
++  help: new TranslatableMarkup('The query will be generated and run using the Search API.'),
++)]
++class SemanticSearchQuery extends SearchApiQuery {
++
++  public const string PLUGIN_ID = 'semantic_search_api_query';
++
++  /**
++   * The event dispatcher service.
++   *
++   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
++   */
++  protected EventDispatcherInterface $eventDispatcher;
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
++    /** @var static $plugin */
++    $plugin = parent::create($container, $configuration, $plugin_id, $plugin_definition);
++    $plugin->setEventDispatcher($container->get('event_dispatcher'));
++    return $plugin;
++  }
++
++  /**
++   * Sets the event dispatcher.
++   */
++  public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): static {
++    $this->eventDispatcher = $eventDispatcher;
++    return $this;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function execute(ViewExecutable $view): void {
++    // This is pretty much borrowed from the parent class.
++    if ($this->shouldAbort()) {
++      if (error_displayable()) {
++        foreach ($this->errors as $msg) {
++          $this->getMessenger()->addError($msg);
++        }
++      }
++      $view->result = [];
++      $view->total_rows = 0;
++      // @phpstan-ignore-next-line property.notFound
++      $view->execute_time = 0;
++      return;
++    }
++
++    // Calculate the "skip result count" option, if it wasn't already set to
++    // FALSE.
++    $skip_result_count = $this->query->getOption('skip result count', TRUE);
++    if ($skip_result_count) {
++      $skip_result_count = !$view->pager->useCountQuery() && empty($view->get_total_rows);
++      $this->query->setOption('skip result count', $skip_result_count);
++    }
++
++    try {
++      // Trigger pager preExecute().
++      $view->pager->preExecute($this->query);
++
++      // Views passes sometimes NULL and sometimes the integer 0 for "All" in a
++      // pager. If set to 0 items, a string "0" is passed. Therefore, we unset
++      // the limit if an empty value OTHER than a string "0" was passed.
++      // @phpstan-ignore-next-line notIdentical.alwaysTrue
++      if (!$this->limit && $this->limit !== '0') {
++        // @phpstan-ignore-next-line assign.propertyType
++        $this->limit = NULL;
++      }
++      // Set the range. We always set this, as there might be an offset even if
++      // all items are shown.
++      $this->query->range($this->offset, $this->limit);
++
++      $start = microtime(TRUE);
++
++      // Execute the search.
++      $results = $this->query->execute();
++
++      // Set up the RAG results in view for testing purposes. This is used in
++      // area plugin.
++      if (\is_array($results->getExtraData('opensearch_response'))) {
++        $event = new ViewsPluginInitializeEvent($results, $view);
++        $this->eventDispatcher->dispatch($event);
++      }
++
++      // Store the results.
++      if (!$skip_result_count) {
++        $view->pager->total_items = $results->getResultCount();
++        if (!empty($view->pager->options['offset'])) {
++          $view->pager->total_items -= $view->pager->options['offset'];
++        }
++        $view->total_rows = $view->pager->total_items;
++      }
++      $view->result = [];
++      if ($results->getResultItems()) {
++        $this->addResults($results, $view);
++      }
++      // @phpstan-ignore-next-line property.notFound
++      $view->execute_time = microtime(TRUE) - $start;
++
++      // Trigger pager postExecute().
++      $view->pager->postExecute($view->result);
++      $view->pager->updatePageInfo();
++    }
++    catch (\Exception $e) {
++      $this->abort($e->getMessage());
++      // Recursion to get the same error behavior as above.
++      $this->execute($view);
++    }
++
++  }
++
++}
+diff --git a/src/SearchAPI/Query/SemanticSearchParamBuilder.php b/src/SearchAPI/Query/SemanticSearchParamBuilder.php
+index dff8b89db295f85d2704e374b54fecb76f6fff51..05e72a97dcc139e885d480a3f80b77587a5c0292 100644
+--- a/src/SearchAPI/Query/SemanticSearchParamBuilder.php
++++ b/src/SearchAPI/Query/SemanticSearchParamBuilder.php
+@@ -66,6 +66,7 @@ class SemanticSearchParamBuilder extends SearchParamBuilder {
+       $neuralQueries['neural'][$semanticField] = [
+         'query_text' => (string) $luceneQuery,
+         'model_id' => $index->getThirdPartySetting('search_api_opensearch_semantic', 'model_id'),
++        'min_score' => $query->getOption('min_score') ?? 0,
+       ];
+     }
+
+@@ -73,7 +74,17 @@ class SemanticSearchParamBuilder extends SearchParamBuilder {
+     $fulltextFields = array_reverse($query->getOption('fulltext_fields', NULL));
+     $textQueries['bool']['should'] = [];
+     foreach ($fulltextFields as $fieldId) {
+-      $textQueries['bool']['should'][] = ['match' => [$fieldId => (string) $luceneQuery]];
++      $textQueries['bool']['should'][] = [
++        'match' => [
++          $fieldId => [
++            'query' => (string) $luceneQuery,
++            // Adding analyzer for english language. It contains various
++            // components like stepping, lowercase, stop words.
++            // https://docs.opensearch.org/latest/analyzers/language-analyzers/english/
++            'analyzer' => 'english',
++          ],
++        ],
++      ];
+     }
+
+     // Note: Following query sequence matters. When we create the
+diff --git a/src/Trait/SemanticIndexTrait.php b/src/Trait/SemanticIndexTrait.php
+index 4d7ca3b05ba60ba7e6be34cbc275075f050ec44e..b73d420eb50987623072da53f5d54707655792fd 100644
+--- a/src/Trait/SemanticIndexTrait.php
++++ b/src/Trait/SemanticIndexTrait.php
+@@ -23,4 +23,19 @@ trait SemanticIndexTrait {
+     return TRUE;
+   }
+
++  /**
++   * Check if RAG is enabled or not.
++   */
++  public function isRagEnabled(string $indexName): bool {
++    $index = Index::load($indexName);
++    $ragSettings = $index->getThirdPartySetting('search_api_opensearch_semantic', 'rag');
++    if ($ragSettings === NULL || !\array_key_exists('enable_rag', $ragSettings)) {
++      return FALSE;
++    }
++    if ((bool) $ragSettings['enable_rag'] === TRUE && $ragSettings['rag_llm_model'] !== '') {
++      return TRUE;
++    }
++    return FALSE;
++  }
++
+ }
+diff --git a/tests/modules/search_api_opensearch_semantic_test/search_api_opensearch_semantic_test.info.yml b/tests/modules/search_api_opensearch_semantic_test/search_api_opensearch_semantic_test.info.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..fc892a86b165b56df501834d4a89e59b3a657a0c
+--- /dev/null
++++ b/tests/modules/search_api_opensearch_semantic_test/search_api_opensearch_semantic_test.info.yml
+@@ -0,0 +1,4 @@
++name: 'Search API OpenSearch Semantic Test'
++type: module
++description: 'Support module for search api semantic search testing.'
++package: Testing
+diff --git a/tests/src/Kernel/RAGIndexTest.php b/tests/src/Kernel/RAGIndexTest.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..cfd5ddf17cc1bce5c6851f75b0f48abe10597cd4
+--- /dev/null
++++ b/tests/src/Kernel/RAGIndexTest.php
+@@ -0,0 +1,30 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\Tests\search_api_opensearch_semantic\Kernel;
++
++use Drupal\search_api_opensearch_semantic\Trait\SemanticIndexTrait;
++
++/**
++ * Tests the trait methods for the RAG feature on the search index.
++ *
++ * @group search_api_opensearch_semantic
++ */
++class RAGIndexTest extends SearchApiOpenSearchSemanticTestBase {
++
++  use SemanticIndexTrait;
++
++  /**
++   * Tests the trait method.
++   */
++  public function testIsRagEnabled(): void {
++    $index = $this->getIndex();
++    $index->setThirdPartySetting('search_api_opensearch_semantic', 'rag', [
++      'enable_rag' => 1,
++      'rag_llm_model' => 'llama3-8b-8192',
++    ])->save();
++    self::assertTrue($this->isRagEnabled($index->id()));
++  }
++
++}

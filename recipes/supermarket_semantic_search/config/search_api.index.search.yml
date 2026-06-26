@@ -1,0 +1,65 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.server.opensearch
+  module:
+    - node
+    - search_api_opensearch
+    - search_api_opensearch_semantic
+third_party_settings:
+  search_api_opensearch_semantic:
+    knn: true
+    model_id: xyz
+    search_pipeline: nlp-search-pipeline
+    rag:
+      enable_rag: true
+      rag_llm_model: 'bedrock-converse/anthropic.claude-3-5-sonnet-20241022-v2:0'
+      rag_prompt: 'You are an assistant that summarizes content from a list of supermarket items. Your goal is to produce a concise, accurate, and student-friendly summary of the search results. Instructions: 1. Base your summary ONLY on the provided content. Do not invent information. 2. If multiple documents are returned, combine them into a single clear summary that highlights: - Key topics or themes. - Main facts, policies, or opportunities. 3. Use neutral, professional, and approachable language. 4. If the retrieved content is repetitive, merge and simplify it. 5. If the retrieved content is unclear or incomplete, state that the information is limited. 6. Return the results as HTML, excluding html, head, and body tags. 7. The answer should only contain the html as a string, stripping out any markdown formatting. 8. Keep results under 150 words. 9. Start heading level at h3 10. Convert lists to string summaries 11. At the end of the summary, include follow up questions or similar search queries as a UL list linked to /search?query={question with + replacing spaces} with an h3 titled Related questions, these do not factor into the max word count. Format these as questions, E.G. where can I find x. Ensure that the related question is always rendered as a link. 12. Remove empty li items.'
+id: search
+name: Search
+description: ''
+read_only: false
+field_settings:
+  aggregated_field:
+    label: 'Rendered HTML output'
+    property_path: rendered_item
+    type: search_api_opensearch_semantic
+    configuration:
+      roles:
+        - anonymous
+      view_mode:
+        'entity:node':
+          ':default': ''
+          article: ':default'
+          page: ':default'
+          supermarket_item: default
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - supermarket_item
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  custom_value: {  }
+  entity_status: {  }
+  entity_type: {  }
+  language_with_fallback: {  }
+  rendered_item: {  }
+  search_api_opensearch_date_range:
+    weights:
+      preprocess_index: 0
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  cron_limit: 50
+  delete_on_fail: true
+  index_directly: true
+  track_changes_in_references: true
+server: opensearch

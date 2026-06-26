@@ -1,0 +1,7 @@
+{
+  "patches": {
+    "drupal/search_api_opensearch_semantic": {
+      "Retrieval-augmented generation (RAG) search (3557349)": "./PATCHES/semantic-search-rag.patch"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.supermarket_item.body
+    - field.field.node.supermarket_item.field_country_of_origin
+    - field.field.node.supermarket_item.field_price
+    - node.type.supermarket_item
+  module:
+    - text
+    - user
+id: node.supermarket_item.teaser
+targetEntityType: node
+bundle: supermarket_item
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_country_of_origin: true
+  field_price: true
+  search_api_excerpt: true

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - search_api_opensearch
+id: opensearch
+name: Opensearch
+description: ''
+backend: opensearch
+backend_config:
+  connector: basicauth
+  connector_config:
+    url: 'http://127.0.0.1:9200'
+    ssl_verification: false
+    username: xyz
+    password: xyz
+  advanced:
+    fuzziness: auto
+    prefix: local_
+    synonyms:
+      - ''
+    max_ngram_diff: 1
