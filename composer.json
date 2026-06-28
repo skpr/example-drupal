@@ -11,12 +11,17 @@
   ],
   "require": {
     "composer/installers": "^2.3",
+    "cweagans/composer-patches": "^1.7",
     "drupal/ai_provider_aws_bedrock": "^1.1",
     "drupal/core-composer-scaffold": "^11.2",
     "drupal/core-project-message": "^11.2",
     "drupal/core-recommended": "^11.2",
+    "drupal/migrate_plus": "^6.0",
+    "drupal/migrate_tools": "^6.1",
     "drupal/prometheus_exporter": "2.x-dev@dev",
+    "drupal/search_api": "^1.41",
     "drupal/search_api_opensearch": "^2.5",
+    "drupal/search_api_opensearch_semantic": "^1.0@alpha",
     "drupal/skpr_logs": "^1.0",
     "drush/drush": "^13",
     "skpr/config": "^3.0"
@@ -33,7 +38,8 @@
       "composer/installers": true,
       "drupal/core-composer-scaffold": true,
       "drupal/core-project-message": true,
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "cweagans/composer-patches": true
     }
   },
   "extra": {
@@ -42,6 +48,8 @@
         "web-root": "app/"
       }
     },
+    "enable-patching": true,
+    "patches-file": "composer.patches.json",
     "installer-paths": {
       "app/core": [
         "type:drupal-core"

@@ -9,6 +9,7 @@ services:
     ports:
       - 8080:8080
       - 3306:3306
+      - 9200:9200
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -53,3 +54,7 @@ services:
     image: axllent/mailpit
     ports:
       - 8025:8025
+
+  elasticsearch-default:
+    image: skpr/opensearch:3.x-vez-test
+    network_mode: service:nginx
