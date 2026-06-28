@@ -5,6 +5,8 @@ ADD composer.patches.json composer.patches.json
 ADD PATCHES PATCHES
 RUN composer install --prefer-dist --no-progress
 
+ADD drush drush
+ADD recipes recipes
 ADD app/sites/default/settings.php app/sites/default/settings.php
 ADD app/sites/default/services.yml app/sites/default/services.yml
 
