@@ -1,6 +1,7 @@
 FROM skpr/php-cli:8.4-v2-latest AS build
 
 ADD composer.json composer.json
+ADD composer.patches.json composer.patches.json
 RUN composer install --prefer-dist --no-progress
 
 ADD app/sites/default/settings.php app/sites/default/settings.php
