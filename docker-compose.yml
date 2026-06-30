@@ -43,7 +43,7 @@ services:
   mysql-default:
     # For "skpr mysql pull dev" to get the latest image.
     # You can replace the environment variables here with hard-coded values.
-    image: ${ECR_ID:-xxxxxx}.dkr.ecr.ap-southeast-2.amazonaws.com/${SKPR_PROJECT:-skpr-project}/mysql/dev:default-latest
+    image: ${ECR_ID:-xxxxxx}.dkr.ecr.ap-southeast-2.amazonaws.com/skpr-test-drupal/mysql/dev:default-latest
     network_mode: service:nginx
 
   ##################
