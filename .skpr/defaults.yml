@@ -10,7 +10,7 @@ ingress:
 
 cron:
   drush:
-    command:  "drush cron"
+    command:  "dr system:cron"
     schedule: "@hourly"
 
 metrics:
