@@ -36,10 +36,11 @@
     "sort-packages": true,
     "allow-plugins": {
       "composer/installers": true,
+      "cweagans/composer-patches": true,
       "drupal/core-composer-scaffold": true,
       "drupal/core-project-message": true,
       "php-http/discovery": true,
-      "cweagans/composer-patches": true
+      "symfony/runtime": true
     }
   },
   "extra": {
