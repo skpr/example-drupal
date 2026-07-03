@@ -1,4 +1,7 @@
-app/
+app/*
+!app/modules
+app/modules/*
+!app/modules/custom/
 bin/
 composer.lock
 config-export/

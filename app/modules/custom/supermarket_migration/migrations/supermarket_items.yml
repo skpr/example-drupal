@@ -1,0 +1,45 @@
+id: supermarket_items
+label: 'Import Supermarket Items'
+migration_group: supermarket
+source:
+  plugin: url
+  data_fetcher_plugin: file
+  data_parser_plugin: json
+  urls:
+    - modules/custom/supermarket_migration/migrations/supermarket-items.json
+  item_selector: /items
+
+  fields:
+    -
+      name: id
+      label: Product ID
+      selector: id
+    -
+      name: title
+      label: Title
+      selector: title
+    -
+      name: description
+      label: Description
+      selector: description
+    -
+      name: price
+      label: Price
+      selector: price
+    -
+      name: country_of_origin
+      label: Country of origin
+      selector: country_of_origin
+
+  ids:
+    id:
+      type: integer
+process:
+  title: title
+  body/value: description
+  field_price: price
+  field_country_of_origin: country_of_origin
+destination:
+  plugin: 'entity:node'
+  default_bundle: supermarket_item
+migration_dependencies: {  }
