@@ -7,6 +7,7 @@ RUN composer install --prefer-dist --no-progress
 
 ADD drush drush
 ADD recipes recipes
+ADD app/modules/custom/ app/modules/custom/
 ADD app/sites/default/settings.php app/sites/default/settings.php
 ADD app/sites/default/services.yml app/sites/default/services.yml
 
