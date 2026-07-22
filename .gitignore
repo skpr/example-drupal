@@ -4,6 +4,7 @@ app/modules/*
 !app/modules/custom/
 bin/
 composer.lock
+patches.lock.json
 config-export/
 vendor/
 .editorconfig

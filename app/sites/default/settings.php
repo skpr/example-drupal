@@ -6,6 +6,7 @@ use Skpr\SkprConfig;
 
 $skpr = SkprConfig::create()->load();
 
+$settings = array();
 $settings['container_yamls'][] = __DIR__ . '/services.yml';
 
 $settings['allow_authorize_operations'] = FALSE;
@@ -15,7 +16,7 @@ $databases['default']['default'] = array(
   'database' => $skpr->get('mysql.default.database') ?: 'local',
   'username' => $skpr->get('mysql.default.username') ?: 'local',
   'password' => $skpr->get('mysql.default.password') ?: 'local',
-  'host' => $skpr->get('mysql.default.proxy') ?: '127.0.0.1',
+  'host' => $skpr->get('mysql.default.hostname') ?: '127.0.0.1',
 );
 
 if ($cert_path = $skpr->get('mysql.default.ca.crt')) {

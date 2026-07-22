@@ -1,4 +1,4 @@
-FROM skpr/php-cli:8.4-v2-latest AS build
+FROM skpr/php-cli:8.5-v2-latest AS build
 
 ADD composer.json composer.json
 ADD composer.patches.json composer.patches.json
