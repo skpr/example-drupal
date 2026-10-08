@@ -7,6 +7,10 @@ ingress:
     php:
       path: /php/*
       origin: dev.php.test.skpr.dev
+  errorPages:
+    server:
+      path: /error-pages/503.html
+      cache: 10
 
 cron:
   drush:
