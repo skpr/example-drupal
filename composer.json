@@ -18,7 +18,7 @@
     "drupal/core-recommended": "^11.2",
     "drupal/migrate_plus": "^6.0",
     "drupal/migrate_tools": "^6.1",
-    "drupal/prometheus_exporter": "2.x-dev@dev",
+    "drupal/prometheus_exporter": "^2.1",
     "drupal/search_api": "^1.41",
     "drupal/search_api_opensearch": "^2.5",
     "drupal/search_api_opensearch_semantic": "^1.0@alpha",
