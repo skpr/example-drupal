@@ -53,3 +53,5 @@ $settings['php_storage']['twig'] = [
 $settings['config_sync_directory'] = DRUPAL_ROOT . '/../config-export';
 
 $settings['deployment_identifier'] = getenv('SKPR_VERSION') ?? \Drupal::VERSION;
+
+$config['cloudfront_purger.settings']['distribution_id'] = $skpr->get('cloudfront.distribution.id', '');
