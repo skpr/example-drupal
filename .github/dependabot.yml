@@ -13,3 +13,6 @@ updates:
       composer-deps:
         patterns:
           - "*"
+      composer-security-deps:
+        applies-to: security-updates
+        patterns: [ "*" ]
