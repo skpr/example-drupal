@@ -13,6 +13,11 @@ updates:
       composer-deps:
         patterns:
           - "*"
+        update-types: [ "minor", "patch" ]
+      composer-major-deps:
+        patterns:
+          - "*"
+        update-types: [ "major" ]
       composer-security-deps:
         applies-to: security-updates
         patterns: [ "*" ]
